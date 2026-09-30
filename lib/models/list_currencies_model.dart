@@ -5,5 +5,4 @@ class ListCurrencies {
   ListCurrencies(this.listCurrencies);
   ListCurrencies.fromJson(Map<String, dynamic> json) :
       listCurrencies = List.from(json.values).map((item) => CotacaoModel.fromJson(item)).toList();
-
 }
