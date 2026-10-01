@@ -11,7 +11,7 @@ class CotacaoService {
   }
   Future<ListCurrencies> fetchListCurrencies() async{
     _response = await http.get(Uri.parse(url));
-    if (_response.statuCode == 200){
+    if (_response.statusCode == 200){
       Map<String, dynamic> retorno = json.decode(_response.body);
       return ListCurrencies.fromJson(retorno);
     } else{

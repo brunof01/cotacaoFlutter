@@ -1,5 +1,10 @@
+import 'package:cotacao/components/paisCotacaoCard.dart';
+import 'package:cotacao/controllers/list_currencies_controller.dart';
+import 'package:cotacao/screens/price_details_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:money2/money2.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -10,14 +15,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  var controller = ListCurrenciesController.listsCurrencies;
+  @override
+  void initState(){
+    super.initState();
+    controller.listCurrencies();
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,23 +29,41 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      body: 
+        Obx(() => controller.isLoading.value ? 
+        Center(
+          child: CircularProgressIndicator(),) : 
+            Container(
+              child: ListView.builder(
+                  padding: EdgeInsets.all(8),
+                  itemCount: controller.listCurrenciesObs.length,
+                  itemBuilder: (BuildContext context, int index){
+                    return Card(
+                      child: ListTile(
+                        onTap: (){
+                          Get.to(PriceDetailsScreen(
+                              cotacaoModel: controller.listCurrenciesObs[index])
+                          );
+                        },
+                        leading: ClipRRect(
+                          borderRadius: BorderRadiusGeometry.circular(8.0),
+                          child:
+                          PaisCotacaoCard(
+                                image: 'assets/imagens-moedas/${controller.listCurrenciesObs[index].symbol}.png',
+                                width: 50
+                            )
+                        ),
+                        title: Text(Money.fromNum(
+                          controller.listCurrenciesObs[index].buy,
+                          isoCode: controller.listCurrenciesObs[index].symbol).toString()
+                        ),
+                        trailing: Icon(Icons.chevron_right),
+                      ),
+                    );
+                  }
+              ),
+            )
+        )
     );
   }
 }
